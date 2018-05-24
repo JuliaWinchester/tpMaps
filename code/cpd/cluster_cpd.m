@@ -5,11 +5,12 @@ chunkSize = 200;
 featureType = 'ConfMax';
 numFeatureMatch = 3;
 
-[flatNames, flatSamples] = get_mesh_names(meshDir, '.mat');
+[flatNames, flatSamples] = get_mesh_names(fullfile(pwd, '../output/etc/flat/mesh/'), '.mat');
+disp(flatSamples);
 
 cpdPath = fullfile(pwd, '../output/etc/cpd/');
 resultPath = fullfile(cpdPath, '/job_rslt_mats/')
-
+disp(cpdPath);
 errPath    = fullfile(cpdPath, '/cluster/error/');
 outPath    = fullfile(cpdPath, '/cluster/out/');
 scriptPath = fullfile(cpdPath, '/cluster/script/');

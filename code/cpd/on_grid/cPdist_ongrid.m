@@ -16,7 +16,7 @@ options.ProgressBar = 'off';
 
 disp(['Comparing ' GM.Aux.name ' vs ' GN.Aux.name '...']);
 
-rslt = ComputeContinuousProcrustesStable(GM, GN, options);
+rslt = GM.ComputeContinuousProcrustes(GN, options);
 
 cPrslt{str2double(TAXAind1),str2double(TAXAind2)} = rslt;
 save(rslt_mat,'cPrslt');

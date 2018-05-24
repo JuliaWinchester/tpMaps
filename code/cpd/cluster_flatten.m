@@ -1,7 +1,7 @@
 function flatSamples = cluster_flatten()
 % CLUSTER_FLATTEN - Submit on_grid/flatten jobs to cluster
 
-[meshNames, meshPaths] = get_mesh_names(meshDir, '.ply');
+[meshNames, meshPaths] = get_mesh_names(fullfile(pwd, '../input/mesh/'), '.ply');
 flatPath = fullfile(pwd, '../output/etc/flat/');
 
 disp('++++++++++++++++++++++++++++++++++++++++++++++++++');

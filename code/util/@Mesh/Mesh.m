@@ -20,10 +20,14 @@ properties
     V2V
     E2E
     c
+    GPLmkIdx
+    ptuq
 end
 
 methods
     function obj = Mesh(varargin)
+        obj.GPLmkIdx = [];
+        obj.ptuq = [];
         if (length(varargin)==1) && isa(varargin{1},'Mesh')
             obj.V=varargin{1}.V;
             obj.nV=varargin{1}.nV;
