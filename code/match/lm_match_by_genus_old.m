@@ -1,4 +1,4 @@
-function [matchLMGenusMap] = lm_match_by_genus(nMesh, genusMap, cpMaps, cpDist, flowGenusMap)
+function [matchLMGenusMap] = lm_match_by_genus_old(nMesh, genusMap, cpMaps, cpDist, flowGenusMap)
 % LM_MATCH_BY_GENUS - Match GP landmarks by genus
 % Written by Julie Winchester <julie.winchester@duke.edu> 3/9/2018
 

@@ -19,19 +19,19 @@ outputDir = fullfile(pwd, '../output/');
 % cluster_run('cluster_cpd', '', pwd, fullfile(pwd, '../output/etc/cpd/'), ...
 % 	'cpd', 1, 'cluster_flatten');
 % cluster_run('process_cpd_results', '', pwd, fullfile(pwd, '../output/etc/cpd/'), ...
-% 	'pcr', 1, 'cpdjob*');
+% 	'pcr', 0, 'cpdjob*');
 
 %genusMap = create_genusMap(fullfile(outputDir, '/etc/flat/mesh/'), fullfile(inputDir, 'prime_sample_master_list.csv'));
 %save(fullfile(outputDir, '/etc/genusMap.mat'), 'genusMap');
 
-% g = load(fullfile(outputDir, '/etc/genusMap.mat'));
-% d = load(fullfile(outputDir, '/etc/cpd/cpDistMatrix.mat'));
+% cluster_run('directed_flows_by_genus', '', pwd, fullfile(pwd, '../output/etc/flows/'), ...
+% 	'flow', 1);
 
-% flowGenusMap = directed_flows_by_genus(g.genusMap, d.cpDist);
-% save(fullfile(outputDir, '/etc/flowGenusMap.mat'), 'flowGenusMap');
+% cluster_run('process_genus_flows', '', pwd, fullfile(pwd, '../output/etc/flows/'), ...
+% 	'pgf', 1, 'flow*');
 
 % [flatNames, flatPaths] = get_mesh_names(fullfile(outputDir, '/etc/flat/mesh/'), '.mat');
-% for i = 1:length(flatPaths)
+% for i = 1:lengt4h(flatPaths)
 % 	disp(flatPaths{i});
 % 	load(flatPaths{i});
 % 	[lm, ptuq] = GetGPLmk(G, 45);
@@ -40,29 +40,20 @@ outputDir = fullfile(pwd, '../output/');
 % 	save(flatPaths{i}, 'G');
 % end
 
-%%% MATCH GP LANDMARKS
+% MATCH GP LANDMARKS
 
-% m = load(fullfile(outputDir, '/etc/cpd/cpMapsMatrix.mat'));
-% cpMaps = m.cpMaps;
-% d = load(fullfile(outputDir, '/etc/cpd/cpDistMatrix.mat'));
-% cpDist = d.cpDist;
-% g = load(fullfile(outputDir, '/etc/genusMap.mat'));
-% genusMap = g.genusMap;
-% f = load(fullfile(outputDir, '/etc/flowGenusMap.mat'));
-% flowGenusMap = f.flowGenusMap;
+% cluster_run('lm_match_by_genus', '', pwd, fullfile(pwd, '../output/etc/match/'), 'match', 1);
 
-% matchLMGenusMap = lm_match_by_genus(length(meshNames), genusMap, cpMaps, cpDist, flowGenusMap);
-
-% save(fullfile(outputDir, '/etc/matchLMGenusMap.mat'), 'matchLMGenusMap');
+% cluster_run('process_lm_match', '', pwd, fullfile(pwd, '../output/etc/match'), 'plm', 0, 'match*');
 
 %%% GENERATE NEW CPMAPS FROM MATCHED LANDMARKS %%%
 
-cluster_run('cluster_cpd_lmk', '', pwd, fullfile(pwd, '../output/etc/cpd_lmk/'), ...
-	'cpdlmk', 1);
+% cluster_run('cluster_cpd_lmk', '', pwd, fullfile(pwd, '../output/etc/cpd_lmk/'), ...
+% 	'cpdlmk', 1);
 
-cluster_run('process_cpd_genus_results', '', pwd, fullfile(pwd, '../output/etc/cpd_lmk/'), ...
-	'pcgr', 1, 'cpdjob*');
+% cluster_run('process_cpd_genus_results', '', pwd, fullfile(pwd, '../output/etc/cpd_lmk/'), ...
+% 	'pcgr', 0, 'cpdjob*');
 
 cluster_run('combine_cpd', '', pwd, fullfile(pwd, '../output/etc/cpd_combined/'), ...
-	'combine_cpd', 1, 'pcgr');
+	'combine_cpd', 0, 'pcgr');
 

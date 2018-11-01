@@ -4,7 +4,7 @@ function cluster_cpd_lmk()
 outputDir = fullfile(pwd, '../output/');
 cpdLmkDir = fullfile(outputDir, '/etc/cpd_lmk/');
 
-matchLMGenusMap = load(fullfile(outputDir, '/etc/matchLMGenusMap.mat'));
+matchLMGenusMap = load(fullfile(outputDir, '/etc/match/matchLMGenusMap.mat'));
 matchLMGenusMap = matchLMGenusMap.matchLMGenusMap;
 
 for g = matchLMGenusMap.keys

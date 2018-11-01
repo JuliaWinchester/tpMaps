@@ -3,13 +3,16 @@ function [resultPath, chunkSize] = cpd_lmk_genus(g)
 
 chunkSize = 20;
 featureType = 'Landmarks';
-numFeatureMatch = 4;
+numFeatureMatch = 3;
 
 outputDir = fullfile(pwd, '../output/');
 
-matchLMGenusMap = load(fullfile(outputDir, '/etc/matchLMGenusMap.mat'));
+matchLMGenusMap = load(fullfile(outputDir, '/etc/match/matchLMGenusMap.mat'));
 matchLMGenusMap = matchLMGenusMap.matchLMGenusMap;
 idx = matchLMGenusMap(g).idx;
+if length(idx) == 1
+    return
+end
 
 [flatNames, flatSamples] = get_mesh_names(fullfile(pwd, '../output/etc/flat/mesh/'), '.mat');
 

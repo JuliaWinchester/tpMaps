@@ -1,4 +1,4 @@
-function Flows = ComputeDirectedFlowsSubset(dists, inds)
+function Flows = ComputeDirectedFlowsSubset(genus)
 % Returns the directed flow matrix a la "Eyes on the Prize I" for given indices 
 %
 %Input
@@ -8,6 +8,19 @@ function Flows = ComputeDirectedFlowsSubset(dists, inds)
 %Output:
 %Flows: cell of size z x z with each entry denoting the directed adjacency
 %matrix of flows from i to j
+
+outputDir = fullfile(pwd, '../output/');
+flowDir = fullfile(outputDir, '/etc/flows/');
+
+genusMap = load(fullfile(outputDir, '/etc/genusMap.mat'));
+genusMap = genusMap.genusMap;
+inds = genusMap(genus);
+
+g_dir = fullfile(flowDir, genus);
+touch(g_dir);
+
+cpDist = load(fullfile(outputDir, '/etc/cpd/cpDistMatrix.mat'));
+dists = cpDist.cpDist;
 
 [m,n] = size(dists);
 z     = length(inds);
@@ -41,4 +54,7 @@ for i = inds
         end
     end
 end
+
+save(fullfile(g_dir, [genus '_flows.mat']), 'Flows');
+
 end

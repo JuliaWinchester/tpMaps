@@ -85,6 +85,8 @@ if exist('FeatureType','var')
                 scatter3(V(1,G.Aux.GaussMinInds),V(2,G.Aux.GaussMinInds),V(3,G.Aux.GaussMinInds),30,'b','filled');
             case 'admax'
                 scatter3(V(1,G.Aux.ADMaxInds),V(2,G.Aux.ADMaxInds),V(3,G.Aux.ADMaxInds),30,'y','filled');
+            case 'gplmk'
+                scatter3(V(1,G.Aux.GPLmkInds),V(2,G.Aux.GPLmkInds),V(3,G.Aux.GPLmkInds),30,'g','filled');
             otherwise
                 disp('Un-recognizable Feature Type');
         end

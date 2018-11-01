@@ -8,7 +8,7 @@ resultPath = fullfile(outputDir, '/etc/cpd_lmk/');
 [flatNames, flatSamples] = get_mesh_names(fullfile(outputDir, '/etc/flat/mesh/'), '.mat');
 meshNum = length(flatNames);
 
-matchLMGenusMap = load(fullfile(outputDir, '/etc/matchLMGenusMap.mat'));
+matchLMGenusMap = load(fullfile(outputDir, '/etc/match/matchLMGenusMap.mat'));
 matchLMGenusMap = matchLMGenusMap.matchLMGenusMap;
 genusKeys = matchLMGenusMap.keys;
 
@@ -26,9 +26,13 @@ for i = 1:length(genusKeys)
     disp(g);
     idx = matchLMGenusMap(g).idx;
 
+    if length(idx) == 1
+        continue
+    end
+
     jobMatPath = fullfile(resultPath, g, '/job_rslt_mats/');
-    tc1Path = fullfile(resultPath, g, '/texture_coords_1/');
-    tc2Path = fullfile(resultPath, g, '/texture_coords_2/');
+    tc1Path = fullfile(resultPath, '/texture_coords_1/');
+    tc2Path = fullfile(resultPath, '/texture_coords_2/');
 
     %%% read rslt matrices and separate distance and landmarkMSE's
     cnt = 0;
@@ -37,61 +41,51 @@ for i = 1:length(genusKeys)
         if ~ismember(k1, idx)
             continue
         end
-        disp(k1);
         for k2=1:meshNum
             if ~ismember(k2, idx) || k1 == k2
                 continue
             end
-            disp(k2);
             if mod(cnt,chunkSize)==0
                 job_id = job_id+1;
                 load(fullfile(jobMatPath, ['rslt_mat_' num2str(job_id)]));
             end
-            if exist('cPrslt')
-                cpDist(k1,k2) = cPrslt{k1,k2}.cPdist;
-                cpMaps{k1,k2} = cPrslt{k1,k2}.cPmap;
-                cpMapsInv{k1,k2} = cPrslt{k1,k2}.invcPmap;
-                tc1Temp{k1,k2} = cPrslt{k1,k2}.TextureCoords1;
-                tc2Temp{k1,k2} = cPrslt{k1,k2}.TextureCoords2;
+            if exist('cPrslt') && ~isempty(cPrslt{k1,k2})
+                disp(['Processing cPrslt results for pair ' num2str(k1) ' and ' num2str(k2)]);
+                cpStruct = cPrslt{k1, k2};
+                cpDist(k1,k2) = cpStruct.cPdist;
+                cpMaps{k1,k2} = cpStruct.cPmap;
+                cpMapsInv{k1,k2} = cpStruct.invcPmap;
+                tc1Temp{k1,k2} = cpStruct.TextureCoords1;
+                tc2Temp{k1,k2} = cpStruct.TextureCoords2;
             elseif exist('Imprrslt')
-                cpDist(k1,k2) = Imprrslt{k1,k2}.ImprDist;
-                cpMaps{k1,k2} = Imprrslt{k1,k2}.ImprMap;
-                cpMapsInv{k1,k2} = Imprrslt{k1,k2}.invImprMap;
-                tc1Temp{k1,k2} = Imprrslt{k1,k2}.TextureCoords1;
-                tc2Temp{k1,k2} = Imprrslt{k1,k2}.TextureCoords2;
+                disp(['Processing Imprrslt results for pair ' num2str(k1) ' and ' num2str(k2)]);
+                ImprStruct = Imprrslt{k1,k2};
+                cpDist(k1,k2) = ImprStruct.ImprDist;
+                cpMaps{k1,k2} = ImprStruct.ImprMap;
+                cpMapsInv{k1,k2} = ImprStruct.invImprMap;
+                tc1Temp{k1,k2} = ImprStruct.TextureCoords1;
+                tc2Temp{k1,k2} = ImprStruct.TextureCoords2;
+            else
+                disp(['Comparison for pair ' num2str(k1) ' and ' num2str(k2) ' not present, skipping']);
             end
-                
+              
             cnt = cnt+1;
         end
     end
 
     %%% symmetrize
-    cnt = 0;
-    job_id = 0;
     for j=1:meshNum
         if ~ismember(j, idx)
             continue
         end
-        disp(j);
         for k=1:meshNum
-            if ~ismember(k, idx) || j == k
+            if ~ismember(k, idx) || j == k || isempty(cpDist(j, k))
                 continue
             end
-            disp(k);
-            if mod(cnt,chunkSize)==0
-                if cnt>0
-                    save(fullfile(tc1Path, ...
-                        ['TextureCoords1_mat_' num2str(job_id) '.mat']), ... 
-                        'tc1');
-                    save(fullfile(tc2Path, ...
-                        ['TextureCoords2_mat_' num2str(job_id) '.mat']), ...
-                        'tc2');
-                    clear tc1 tc2;
-                end
-                job_id = job_id+1;
-                tc1 = cell(meshNum,meshNum);
-                tc2 = cell(meshNum,meshNum);
-            end
+
+            tc1 = cell(meshNum,meshNum);
+            tc2 = cell(meshNum,meshNum);
+
             if cpDist(j,k)<cpDist(k,j)
                 cpMaps{k,j} = cpMapsInv{j,k};
                 tc1{j,k} = tc1Temp{j,k};
@@ -101,17 +95,19 @@ for i = 1:length(genusKeys)
                 tc1{j,k} = tc2Temp{k,j};
                 tc2{j,k} = tc1Temp{k,j};
             end
-            cnt = cnt+1;
+            
+            touch(fullfile(tc1Path, num2str(j)));
+            save(fullfile(tc1Path, num2str(j), ...
+                ['TextureCoords1_mat_' num2str(j) '_' num2str(k) '.mat']), ... 
+                'tc1');
+            touch(fullfile(tc2Path, num2str(j)));
+            save(fullfile(tc2Path, num2str(j), ...
+                ['TextureCoords2_mat_' num2str(j) '_' num2str(k) '.mat']), ...
+                'tc2');
+            clear tc1 tc2;
         end
     end
 
-    % if mod(cnt,chunkSize)~=0
-    save(fullfile(tc1Path, ['TextureCoords1_mat_' num2str(job_id) '.mat']), ... 
-        'tc1');
-    save(fullfile(tc2Path, ['TextureCoords2_mat_' num2str(job_id) '.mat']), ...
-        'tc2');
-    clear tc1 tc2;
-    % end
 end
 
 cpDist = min(cpDist,cpDist');
